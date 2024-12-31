@@ -1,0 +1,5 @@
+name: SC-MiniGame-OneBlock
+version: '1.0'
+main: com.stemcraft.OneBlock
+api-version: '1.21'
+depend: [STEMCraftLib]

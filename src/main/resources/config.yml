@@ -1,0 +1,165 @@
+one-block:
+  drop-rate: 1.2
+  drop-every: 20
+  mob-rate: 0.05
+  materials:
+    1: [DIRT, OAK_LOG, STONE, OAK_SAPLING]
+    2: [GRAVEL, SAND, COAL_ORE, BIRCH_SAPLING]
+
+  mobs:
+    1:
+      - CHICKEN
+    2:
+        materials:
+          - GRAVEL
+          - SAND
+          - COAL_ORE
+          - BIRCH_SAPLING
+        mobs:
+          - ZOMBIE
+      3:
+        materials:
+          - IRON_ORE
+          - COBBLESTONE
+          - CLAY
+          - SPRUCE_SAPLING
+        mobs:
+          - SHEEP
+      4:
+        materials:
+          - GOLD_ORE
+          - BIRCH_LOG
+          - LEAVES
+          - JUNGLE_SAPLING
+        mobs:
+          - COW
+
+          5
+
+      19
+
+      REDSTONE_ORE, GLASS, WOOL, ACACIA_SAPLING, PIG_SPAWN_EGG
+
+      6
+
+      22
+
+      LAPIS_ORE, BRICKS, SANDSTONE, DARK_OAK_SAPLING, HORSE_SPAWN_EGG
+
+      7
+
+      26
+
+      DIAMOND_ORE, OBSIDIAN, RAIL, BAMBOO, VILLAGER_SPAWN_EGG
+
+      8
+
+      31
+
+      EMERALD_ORE, QUARTZ, BOOKSHELF, MANGROVE_SAPLING, WOLF_SPAWN_EGG
+
+      9
+
+      37
+
+      NETHERITE_SCRAP, GLOWSTONE, CHEST, AZALEA, FOX_SPAWN_EGG
+
+      10
+
+      44
+
+      END_STONE, SEA_LANTERN, ANVIL, FLOWERING_AZALEA, BEE_SPAWN_EGG
+
+      11
+
+      52
+
+      BEACON, CONDUIT, ENCHANTING_TABLE, MOSS_BLOCK, PANDA_SPAWN_EGG
+
+      12
+
+      62
+
+      SHULKER_BOX, ELYTRA, DRAGON_EGG, MANGROVE_PROPAGULE, AXOLOTL_SPAWN_EGG
+
+levels:
+  1:
+    materials:
+      - DIRT
+      - OAK_LOG
+      - STONE
+      - OAK_SAPLING
+    mobs:
+      - CHICKEN
+  2:
+    materials:
+      - GRAVEL
+      - SAND
+      - COAL_ORE
+      - BIRCH_SAPLING
+    mobs:
+      - ZOMBIE
+  3:
+    materials:
+      - IRON_ORE
+      - COBBLESTONE
+      - CLAY
+      - SPRUCE_SAPLING
+    mobs:
+      - SHEEP
+  4:
+    materials:
+      - GOLD_ORE
+      - BIRCH_LOG
+      - LEAVES
+      - JUNGLE_SAPLING
+    mobs:
+      - COW
+
+      5
+
+  19
+
+  REDSTONE_ORE, GLASS, WOOL, ACACIA_SAPLING, PIG_SPAWN_EGG
+
+  6
+
+  22
+
+  LAPIS_ORE, BRICKS, SANDSTONE, DARK_OAK_SAPLING, HORSE_SPAWN_EGG
+
+  7
+
+  26
+
+  DIAMOND_ORE, OBSIDIAN, RAIL, BAMBOO, VILLAGER_SPAWN_EGG
+
+  8
+
+  31
+
+  EMERALD_ORE, QUARTZ, BOOKSHELF, MANGROVE_SAPLING, WOLF_SPAWN_EGG
+
+  9
+
+  37
+
+  NETHERITE_SCRAP, GLOWSTONE, CHEST, AZALEA, FOX_SPAWN_EGG
+
+  10
+
+  44
+
+  END_STONE, SEA_LANTERN, ANVIL, FLOWERING_AZALEA, BEE_SPAWN_EGG
+
+  11
+
+  52
+
+  BEACON, CONDUIT, ENCHANTING_TABLE, MOSS_BLOCK, PANDA_SPAWN_EGG
+
+  12
+
+  62
+
+  SHULKER_BOX, ELYTRA, DRAGON_EGG, MANGROVE_PROPAGULE, AXOLOTL_SPAWN_EGG
