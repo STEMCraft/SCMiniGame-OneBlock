@@ -11,6 +11,6 @@ public class PlayerQuitListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        OneBlock.stop(player);
+        OneBlock.stopInstance(player);
     }
 }

@@ -4,14 +4,15 @@ import com.stemcraft.chunkgen.VoidChunkGenerator;
 import com.stemcraft.listener.PlayerChangedWorldListener;
 import com.stemcraft.listener.PlayerDeathListener;
 import com.stemcraft.listener.PlayerQuitListener;
-import com.stemcraft.storage.BookDataStorage;
-import com.stemcraft.storage.YamlBookDataStorage;
+import com.stemcraft.util.SCHologram;
 import com.stemcraft.util.SCPlayer;
+import com.stemcraft.util.SCString;
 import com.stemcraft.util.SCWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 
 public class OneBlock extends STEMCraftPlugin {
@@ -30,8 +32,8 @@ public class OneBlock extends STEMCraftPlugin {
     private static YamlConfiguration config;
     private static Map<String, OneBlockData> worlds;
     private static final Random random = new Random();
-    private static Map<Integer, List<String>> materials = new HashMap<>();
-    private static Map<Integer, List<String>> mobs = new HashMap<>();
+    private static final Map<Integer, List<String>> materials = new HashMap<>();
+    private static final Map<Integer, List<String>> mobs = new HashMap<>();
 
     public static class OneBlockData {
         public World world;
@@ -132,6 +134,10 @@ public class OneBlock extends STEMCraftPlugin {
                         nextLevelCounter--;
                         if(nextLevelCounter <= 0) {
                             level++;
+
+                            Bukkit.getScheduler().runTaskLater(instance, () -> {
+                                save();
+                            }, 20L);
                         }
 
                         if(random.nextDouble() <= 0.05) {
@@ -147,6 +153,7 @@ public class OneBlock extends STEMCraftPlugin {
         }
 
         public void stop(Runnable callback) {
+            save();
             onStop = callback;
             shouldStop = true;
         }
@@ -159,10 +166,29 @@ public class OneBlock extends STEMCraftPlugin {
                 config.set("one-block.players." + player.getUniqueId() + ".last-location", SCString.locationToString(player.getLocation(), false, true));
             }
 
+            updateScore(false);
+
             try {
                 config.save(configFile);
             } catch (IOException e) {
                 STEMCraftLib.log(Level.SEVERE, "Failed to save the oneblock configuration file", e);
+            }
+        }
+
+        public void updateScore(boolean save) {
+            int score = config.getInt("one-block.scores." + player.getUniqueId());
+            if(score < level) {
+                config.set("one-block.scores." + player.getUniqueId(), level);
+
+                SCHologram.updateAll("oneblock-score");
+
+                if(save) {
+                    try {
+                        config.save(configFile);
+                    } catch (IOException e) {
+                        STEMCraftLib.log(Level.SEVERE, "Failed to save the oneblock configuration file", e);
+                    }
+                }
             }
         }
     }
@@ -197,14 +223,73 @@ public class OneBlock extends STEMCraftPlugin {
         tabCompletions.add(new String[]{"join"});
         tabCompletions.add(new String[]{"leave"});
         tabCompletions.add(new String[]{"delete"});
+        tabCompletions.add(new String[]{"hologram", "create"});
+        tabCompletions.add(new String[]{"hologram", "delete"});
 
         registerCommand(new com.stemcraft.command.OneBlock(instance), "oneblock", null, tabCompletions);
 
         registerEvents(new PlayerChangedWorldListener());
         registerEvents(new PlayerQuitListener());
         registerEvents(new PlayerDeathListener());
+
+        SCHologram.registerType("oneblock-score", () -> {
+            List<String> text = new ArrayList<>();
+            Map<UUID, Integer> scores = new HashMap<>();
+            ConfigurationSection section = config.getConfigurationSection("one-block.scores");
+
+            text.add("&6-- One Block Champions --");
+
+            if (section != null) {
+                for (String key : section.getKeys(false)) {
+                    try {
+                        UUID uuid = UUID.fromString(key);
+                        int level = section.getInt(key);
+                        scores.put(uuid, level);
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
+                }
+            }
+
+            scores = scores.entrySet().stream()
+                    .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue())) // Sort descending
+                    .limit(10)
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (e1, e2) -> e1,
+                            LinkedHashMap::new));
+
+
+            int spaceWidth = SCString.calculatePixelWidth(" ");
+            if(!scores.isEmpty()) {
+                for (Map.Entry<UUID, Integer> entry : scores.entrySet()) {
+                    StringBuilder name = new StringBuilder(SCPlayer.name(String.valueOf(entry.getKey()))); // Get player name
+                    int score = entry.getValue();
+
+                    // Ensure name width ~120 pixels
+                    int currentWidth = SCString.calculatePixelWidth(name.toString());
+                    while (currentWidth < 120) { // Add spaces until width is ~120
+                        name.append(" ");
+                        currentWidth += spaceWidth;
+                    }
+                    while (currentWidth > 120) { // Trim letters if width exceeds 120
+                        name = new StringBuilder(name.substring(0, name.length() - 1));
+                        currentWidth = SCString.calculatePixelWidth(name.toString());
+                    }
+
+                    // Add formatted entry
+                    text.add("&f" + name + "   &2" + score); // White name, dark green score
+                }
+            } else {
+                text.add("&fNo one has played yet!");
+            }
+
+            return text;
+       });
     }
 
+    @SuppressWarnings("unused")
     public OneBlock getInstance() {
         return instance;
     }
@@ -249,12 +334,11 @@ public class OneBlock extends STEMCraftPlugin {
     }
 
     public static void joinInstance(Player player) {
-        String worldName = getWorldName(player);
         OneBlockData data = startInstance(player);
 
         String lastLocationPath = "one-block.players." + player.getUniqueId() + ".last-location";
         if(config.contains(lastLocationPath)) {
-            SCPlayer.teleport(player, SCString.locationFromString(config.get(lastLocationPath, data.world)));
+            SCPlayer.teleport(player, SCString.stringToLocation(config.getString(lastLocationPath, ""), data.world));
         } else {
             SCPlayer.teleport(player, data.world.getSpawnLocation());
         }
@@ -262,6 +346,10 @@ public class OneBlock extends STEMCraftPlugin {
 
     public static void deleteInstance(Player player) {
         String worldName = getWorldName(player);
+
+        if(worlds.containsKey(worldName)) {
+            worlds.get(worldName).updateScore(true);
+        }
 
         SCWorld.delete(worldName);
         config.set("one-block.players." + player.getUniqueId(), null);
@@ -282,6 +370,6 @@ public class OneBlock extends STEMCraftPlugin {
     }
 
     public static String getWorldName(Player player) {
-        return "oneblock-" + player.getUniqueId().toString();
+        return "oneblock-" + player.getUniqueId();
     }
 }

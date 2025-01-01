@@ -15,7 +15,7 @@ public class PlayerDeathListener implements Listener {
         String worldName = OneBlock.getWorldName(player);
 
         if(player.getWorld().getName().equalsIgnoreCase(worldName)) {
-            OneBlock.delete(player);
+            OneBlock.deleteInstance(player);
         }
     }
 
