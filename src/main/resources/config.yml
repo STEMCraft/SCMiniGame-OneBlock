@@ -1,5 +1,5 @@
 one-block:
-  drop-ratez: 1.2
+  drop-rate: 1.2
   drop-every: 20
   mob-rate: 0.05
   materials:
